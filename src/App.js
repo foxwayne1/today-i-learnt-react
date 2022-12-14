@@ -55,12 +55,12 @@ function App() {
   const [formHidden, setFormHidden] = useState(true)
 
   const handleFormHidden = () => {
-    setFormHidden(!formHidden)
+    setFormHidden(formHidden => !formHidden)
   }
 
   return (
     <>
-      <Header functionForBtn={handleFormHidden} />
+      <Header functionForBtn={handleFormHidden} formHidden={formHidden} />
       {!formHidden && <NewFactForm />}
       <main className='main'>
         <CategoryFilter categories={CATEGORIES} />

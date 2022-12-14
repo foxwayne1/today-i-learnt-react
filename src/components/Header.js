@@ -1,4 +1,4 @@
-const Header = ({ functionForBtn }) => {
+const Header = ({ functionForBtn, formHidden }) => {
   return (
     <header className='header'>
       <div className='logo'>
@@ -6,7 +6,7 @@ const Header = ({ functionForBtn }) => {
         <h1>Today I Learnt</h1>
       </div>
       <button className='btn btn-large btn-open' onClick={functionForBtn}>
-        Share a fact
+        {formHidden ? 'Share a fact' : 'Close'}
       </button>
     </header>
   )
