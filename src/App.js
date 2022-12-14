@@ -3,7 +3,7 @@ import Header from './components/Header'
 import CategoryFilter from './components/CategoryFilter'
 import NewFactForm from './components/NewFactForm'
 import FactList from './components/FactList'
-import { supabase } from './supabaseClient'
+// import { supabase } from './supabaseClient'
 
 // data
 const CATEGORIES = [
