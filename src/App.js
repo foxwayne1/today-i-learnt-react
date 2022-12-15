@@ -1,9 +1,9 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Header from './components/Header'
 import CategoryFilter from './components/CategoryFilter'
 import NewFactForm from './components/NewFactForm'
 import FactList from './components/FactList'
-// import { supabase } from './supabaseClient'
+import { supabase } from './supabaseClient'
 
 // data
 const CATEGORIES = [
@@ -52,7 +52,17 @@ const initialFacts = [
 ]
 
 function App() {
+  const [data, setData] = useState([])
+
+  useEffect(() => {
+    async function boo() {
+      let { data, error } = await supabase.from('facts').select()
+      setData(data)
+    }
+    boo()
+  }, [])
   const [formHidden, setFormHidden] = useState(true)
+  console.log(data, 'DATA DUMMY')
 
   const handleFormHidden = () => {
     setFormHidden(formHidden => !formHidden)
@@ -64,7 +74,7 @@ function App() {
       {!formHidden && <NewFactForm />}
       <main className='main'>
         <CategoryFilter categories={CATEGORIES} />
-        <FactList facts={initialFacts} categories={CATEGORIES} />
+        <FactList facts={data} categories={CATEGORIES} />
       </main>
     </>
   )
