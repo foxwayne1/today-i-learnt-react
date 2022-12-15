@@ -53,6 +53,7 @@ const initialFacts = [
 
 function App() {
   const [formHidden, setFormHidden] = useState(true)
+  const [facts, setFacts] = useState(initialFacts)
 
   const handleFormHidden = () => {
     setFormHidden(formHidden => !formHidden)
@@ -61,10 +62,16 @@ function App() {
   return (
     <>
       <Header functionForBtn={handleFormHidden} formHidden={formHidden} />
-      {!formHidden && <NewFactForm />}
+      {!formHidden && (
+        <NewFactForm
+          categories={CATEGORIES}
+          setFacts={setFacts}
+          setFormHidden={setFormHidden}
+        />
+      )}
       <main className='main'>
         <CategoryFilter categories={CATEGORIES} />
-        <FactList facts={initialFacts} categories={CATEGORIES} />
+        <FactList facts={facts} categories={CATEGORIES} />
       </main>
     </>
   )
