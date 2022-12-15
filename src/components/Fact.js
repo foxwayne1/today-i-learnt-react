@@ -4,6 +4,9 @@ import supabase from '../supabaseClient'
 const Fact = ({ fact, categories, setFacts }) => {
   const [isUpdating, setIsUpdating] = useState(false)
 
+  const isDisputed =
+    fact.votesInteresting + fact.votesMindblowing < fact.votesFalse
+
   async function handleVote(columnName) {
     setIsUpdating(true)
     const { data: updatedFact, error } = await supabase
@@ -20,6 +23,7 @@ const Fact = ({ fact, categories, setFacts }) => {
   return (
     <li key={fact.id} className='fact'>
       <p>
+        {isDisputed ? <span className='disputed'>[⛔ DISPUTED ⛔]</span> : null}
         {fact.text}
         <a
           className='source'
