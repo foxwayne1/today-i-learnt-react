@@ -3,7 +3,8 @@ import Header from './components/Header'
 import CategoryFilter from './components/CategoryFilter'
 import NewFactForm from './components/NewFactForm'
 import FactList from './components/FactList'
-import { supabase } from './supabaseClient'
+import Loader from './components/Loader'
+import supabase from './supabaseClient'
 
 // data
 const CATEGORIES = [
@@ -52,17 +53,32 @@ const initialFacts = [
 ]
 
 function App() {
-  const [data, setData] = useState([])
-
-  useEffect(() => {
-    async function boo() {
-      let { data, error } = await supabase.from('facts').select()
-      setData(data)
-    }
-    boo()
-  }, [])
   const [formHidden, setFormHidden] = useState(true)
-  const [facts, setFacts] = useState(initialFacts)
+  const [facts, setFacts] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [currentCategory, setCurrentCategory] = useState('all')
+
+  // load data
+  useEffect(() => {
+    async function getFacts() {
+      setIsLoading(true)
+
+      let query = supabase.from('facts').select('*')
+      if (currentCategory !== 'all')
+        query = query.eq('category', currentCategory)
+
+      let { data: facts, error } = await query
+        .order('votesInteresting', { ascending: false })
+        .limit(999)
+      setFacts(facts)
+
+      if (!error) setFacts(facts)
+      else alert('There was a problem with getting your data.')
+
+      setIsLoading(false)
+    }
+    getFacts()
+  }, [currentCategory])
 
   const handleFormHidden = () => {
     setFormHidden(formHidden => !formHidden)
@@ -79,8 +95,15 @@ function App() {
         />
       )}
       <main className='main'>
-        <CategoryFilter categories={CATEGORIES} />
-        <FactList facts={initialFacts} categories={CATEGORIES} />
+        <CategoryFilter
+          categories={CATEGORIES}
+          setCurrentCategory={setCurrentCategory}
+        />
+        {isLoading ? (
+          <Loader />
+        ) : (
+          <FactList facts={facts} categories={CATEGORIES} setFacts={setFacts} />
+        )}
       </main>
     </>
   )

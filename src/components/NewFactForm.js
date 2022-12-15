@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import supabase from '../supabaseClient'
 
 function isValidHttpUrl(string) {
   let url
@@ -14,29 +15,28 @@ const NewFactForm = ({ categories, setFacts, setFormHidden }) => {
   const [text, setText] = useState('')
   const [source, setSource] = useState('http://example.com')
   const [category, setCategory] = useState('')
+  const [isUploading, setIsUploading] = useState(false)
 
   const textLength = text.length
 
-  const handleFormSubmit = e => {
+  const handleFormSubmit = async e => {
     // 1. prevent browser reload
     e.preventDefault()
 
     // 2. check data is valid, if so, then create a new fact
     if (text && isValidHttpUrl(source) && category && textLength <= 200) {
-      // 3. Create a new fact object
-      const newFact = {
-        id: Math.round(Math.random() * 1000000),
-        text: text,
-        source: source,
-        category: category,
-        votesInteresting: 0,
-        votesMindblowing: 0,
-        votesFalse: 0,
-        createdIn: new Date().getFullYear(),
-      }
+      // 3. upload fact to supabase and recieve the new fact object
+      setIsUploading(true)
+      const { data: newFact, error } = await supabase
+        .from('facts')
+        .insert([{ text, source, category }])
+        .select()
+
+      console.log(newFact)
 
       // 4. add the new fact to the UI: add the fact to state
-      setFacts(facts => [newFact, ...facts])
+      if (!error) setFacts(facts => [newFact[0], ...facts])
+      setIsUploading(false)
 
       // 5. reset input field back t empty
       setText('')
@@ -56,6 +56,7 @@ const NewFactForm = ({ categories, setFacts, setFormHidden }) => {
         value={text}
         onChange={e => setText(e.target.value)}
         maxLength='200'
+        disabled={isUploading}
       />
       <span>{200 - textLength}</span>
       <input
@@ -63,8 +64,13 @@ const NewFactForm = ({ categories, setFacts, setFormHidden }) => {
         placeholder='Trustworthy source...'
         value={source}
         onChange={e => setSource(e.target.value)}
+        disabled={isUploading}
       />
-      <select value={category} onChange={e => setCategory(e.target.value)}>
+      <select
+        value={category}
+        disabled={isUploading}
+        onChange={e => setCategory(e.target.value)}
+      >
         <option value={category}>
           {category ? category.toUpperCase() : 'Choose a category'}
         </option>
@@ -74,7 +80,9 @@ const NewFactForm = ({ categories, setFacts, setFormHidden }) => {
           </option>
         ))}
       </select>
-      <button className='btn btn-large'>Post</button>
+      <button className='btn btn-large' disabled={isUploading}>
+        Post
+      </button>
     </form>
   )
 }

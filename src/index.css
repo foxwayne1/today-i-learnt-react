@@ -161,6 +161,9 @@ a {
 .vote-buttons button:hover {
   background-color: #292524;
 }
+.vote-buttons button:disabled {
+  background-color: #44403c;
+}
 
 .fact-form {
   background-color: #44403c;
